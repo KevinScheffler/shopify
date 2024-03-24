@@ -33,6 +33,7 @@
   id="Banner-{{ section.id }}"
   class="banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank %} banner--stacked{% endif %}{% if section.settings.image_height == 'adapt' and section.settings.image != blank %} banner--adapt{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}"
 >
+{% if section.settings.video_banner != true %}
   {%- if section.settings.image != blank -%}
     <div class="banner__media media{% if section.settings.image == blank and section.settings.image_2 == blank %} placeholder{% endif %}{% if section.settings.image_2 != blank %} banner__media-half{% endif %}">
       {%- liquid
@@ -93,6 +94,21 @@
       }}
     </div>
   {%- endif -%}
+  {% elsif section.settings.video_banner != false %}
+    <div class="banner__media media">
+      <div class="video-container">
+        {% if section.settings.mobile_video != blank and section.settings.desktop_video != blank  %}
+          <video src="{{ section.settings.mobile_video.sources[1].url }}" loop muted autoplay media="(max-width: 768px)"></video>
+          <video src="{{ section.settings.desktop_video.sources[1].url }}" loop muted autoplay media="(min-width: 769px)"></video>
+          {% elsif section.settings.desktop_video != blank and section.settings.mobile_video == blank %}
+            <video src="{{ section.settings.desktop_video.sources[1].url }}" loop muted autoplay></video>
+          {% else %}
+            <video src="{{ section.settings.mobile_video.sources[1].url }}" loop muted autoplay></video>
+        {% endif %}
+      </div>
+    </div>
+  {%- endif -%}
+
   <div class="banner__content banner__content--{{ section.settings.desktop_content_position }} page-width">
     <div class="banner__box content-container content-container--full-width-mobile color-{{ section.settings.color_scheme }} gradient">
       {%- for block in section.blocks -%}
@@ -159,6 +175,22 @@
       "type": "image_picker",
       "id": "image_2",
       "label": "t:sections.image-banner.settings.image_2.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "video_banner",
+      "label": "Video Banner",
+      "default": false
+    },
+    {
+      "type": "video",
+      "id": "desktop_video",
+      "label": "Desktop Video"
+    },
+    {
+      "type": "video",
+      "id": "mobile_video",
+      "label": "Mobile Video"
     },
     {
       "type": "range",
