@@ -11,7 +11,9 @@
             "text": "Coffee Time ☕️",
             "text_alignment": "center",
             "color_scheme": "accent-2",
-            "link": ""
+            "link": "",
+            "countdown_text": "Hurry up! Sale ends:",
+            "countdown_timer": "April 2, 2024 23:59:00 EST"
           }
         }
       },

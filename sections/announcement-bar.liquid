@@ -18,9 +18,20 @@
             </a>
           {%- endif -%}
         {%- endif -%}
+        <div class="countdown-timer" style="text-align: center;">
+        {%- if block.settings.countdown_text != blank -%}
+          {{block.settings.countdown_text}}
+        {%- endif -%}
+        {%- if block.settings.countdown_timer != blank -%}
+          {%-  assign countdown_date = block.settings.countdown_timer  -%}
+          <span id="countdown" data-countdown-date="{{countdown_date}}"></span>
+        {%- endif -%}
+        </div>
       </div>
   {%- endcase -%}
 {%- endfor -%}
+
+
 
 {% schema %}
 {
@@ -90,6 +101,17 @@
           "type": "url",
           "id": "link",
           "label": "t:sections.announcement-bar.blocks.announcement.settings.link.label"
+        },
+        {
+          "type": "text",
+          "id": "countdown_text",
+          "label": "Enter text for countdown timer"
+        },
+        {
+          "type": "text",
+          "id": "countdown_timer",
+          "label": "Countdown date/deadline",
+          "info": "Ex: June 16, 2023 23:59:00 EST"
         }
       ]
     }
@@ -101,5 +123,5 @@
       }
     ]
   }
-}
+} 
 {% endschema %}
