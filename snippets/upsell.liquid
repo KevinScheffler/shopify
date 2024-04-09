@@ -1,0 +1,102 @@
+<style>
+  #upsell_section {
+    width: 50%;
+    margin: 0 auto;
+  }
+</style>
+
+
+<div id="upsell_section">
+  <form id="upsell_form">
+    {%- assign upsell_product = settings.upsell_product_selector -%}
+    <input type="hidden" id="upsell_input" name="id" value="{{ upsell_product.variants.first.id }}" />
+    <h2>{{settings.upsell_headline}}</h2>
+    {% render 'card-product', card_product: upsell_product, featured_media: upsell_product, media_aspect_ratio:
+    upsell_product, media_aspect_ratio: upsell_product %}
+    <button type="button" id="upsell_btn" class="quick-add__submit button button--full-width button--secondary">Add to
+      Cart</button>
+  </form>
+</div>
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const updateEventListenersForQuantities = () => {
+      document.querySelectorAll('input[name="updates[]"]').forEach(quantity => {
+        quantity.removeEventListener("change", handleQuantityChange); // Remove existing to prevent duplicates
+        quantity.addEventListener("change", handleQuantityChange);
+      });
+    };
+
+    const handleQuantityChange = (event) => {
+      if (event.target.value > 0) {
+        reRenderCart();
+      }
+    };
+
+    const addUpsellToCart = async (event) => {
+      if (event.target && event.target.id === 'upsell_btn') {
+        const formData = new FormData(document.getElementById('upsell_form'));
+        try {
+          const response = await fetch('/cart/add.js', {
+            method: 'POST',
+            body: formData,
+          });
+          await response.json();
+          reRenderCart();
+        } catch (error) {
+          console.error('Error adding product:', error);
+        }
+      }
+    };
+
+
+
+    const reRenderCart = async () => {
+      try {
+        const cartResponse = await fetch("/cart.js");
+        const cart = await cartResponse.json();
+
+        const cartHtmlResponse = await fetch("/cart");
+        const cartHtml = await cartHtmlResponse.text();
+
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(cartHtml, "text/html");
+        const formSelector = doc.querySelector("form[action='/cart']");
+        const form = document.querySelector("form[action='/cart']");
+
+        if (form && formSelector) {
+          form.outerHTML = formSelector.outerHTML;
+          document.getElementById('upsell_btn').addEventListener('click', addUpsellToCart);
+
+
+          // Update subtotal
+          const subtotalElement = document.querySelector('.totals__subtotal-value');
+          const subTotal = cart.total_price / 100;
+          const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+          });
+          subtotalElement.textContent = formatter.format(subTotal);
+
+          // Check if Upsell Product is in cart
+          const upsellVariantId = document.querySelector('input[name="id"]').value;
+          const upsellSection = document.getElementById('upsell_section');
+          const isProductInCart = cart.items.some(item => item.variant_id.toString() === upsellVariantId.toString());
+          upsellSection.style.display = isProductInCart ? 'none' : 'block';
+        }
+
+        updateEventListenersForQuantities();
+      } catch (error) {
+        console.error("Error fetching cart:", error);
+      }
+    };
+
+    // Attach event listener to a parent element
+    document.body.addEventListener('click', addUpsellToCart);
+    updateEventListenersForQuantities();
+    reRenderCart();
+  });
+</script>

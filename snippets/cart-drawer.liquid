@@ -5,7 +5,9 @@
   {% render 'cart-drawer' %}
 {% endcomment %}
 
+
 <script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
+
 
 <style>
   .drawer {
@@ -18,6 +20,7 @@
     <div id="CartDrawer-Overlay" class="cart-drawer__overlay"></div>
     <div
       class="drawer__inner"
+      id="drawerInner"
       role="dialog"
       aria-modal="true"
       aria-label="{{ 'sections.cart.title' | t }}"
@@ -110,7 +113,7 @@
 
                   <tbody role="rowgroup">
                     {%- for item in cart.items -%}
-                      <tr id="CartDrawer-Item-{{ item.index | plus: 1 }}" class="cart-item" role="row">
+                      <tr id="CartDrawer-Item-{{ item.index | plus: 1 }}" class="cart-item" data-variant-id="{{item.variant.id}}" role="row">
                         <td class="cart-item__media" role="cell" headers="CartDrawer-ColumnProductImage">
                           {% if item.image %}
                             {% comment %} Leave empty space due to a:empty CSS display: none rule {% endcomment %}
@@ -349,7 +352,9 @@
           </div>
           <div id="CartDrawer-CartErrors" role="alert"></div>
         </form>
+        {% render 'upsell' %}
       </cart-drawer-items>
+      
       <div class="drawer__footer">
         {%- if settings.show_cart_note -%}
           <details id="Details-CartDrawer">
@@ -433,6 +438,7 @@
     </div>
   </div>
 </cart-drawer>
+
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
